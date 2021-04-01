@@ -21,7 +21,7 @@ import org.apache.hadoop.mapreduce.Counter;
 import org.apache.hadoop.util.GenericOptionsParser;
 import org.apache.hadoop.util.StringUtils;
 
-public class WordCount2 {
+public class WordCount {
 
     public static class TokenizerMapper
             extends Mapper<Object, Text, Text, IntWritable>{
@@ -101,6 +101,7 @@ public class WordCount2 {
     }
 
     public static void main(String[] args) throws Exception {
+        long startTime = System.currentTimeMillis();
         Configuration conf = new Configuration();
         GenericOptionsParser optionParser = new GenericOptionsParser(conf, args);
         String[] remainingArgs = optionParser.getRemainingArgs();
@@ -109,7 +110,7 @@ public class WordCount2 {
             System.exit(2);
         }
         Job job = Job.getInstance(conf, "word count");
-        job.setJarByClass(WordCount2.class);
+        job.setJarByClass(WordCount.class);
         job.setMapperClass(TokenizerMapper.class);
         job.setCombinerClass(IntSumReducer.class);
         job.setReducerClass(IntSumReducer.class);
@@ -128,6 +129,9 @@ public class WordCount2 {
         FileInputFormat.addInputPath(job, new Path(otherArgs.get(0)));
         FileOutputFormat.setOutputPath(job, new Path(otherArgs.get(1)));
 
-        System.exit(job.waitForCompletion(true) ? 0 : 1);
+        job.waitForCompletion(true);
+
+        System.out.println(String.format("Execution Time: ", System.currentTimeMillis()-startTime));
+        System.exit(0);
     }
 }
